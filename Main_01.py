@@ -29,13 +29,15 @@ def visualizar():
         Close_Button.configure(bg = "#FFFFFF")
         pantalla.configure(bg = "#FFFFFF")
         texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="black")
-        texto3 = pantalla.create_text(500, 640, text=f"Waiting for detection...", font=("Helvetica", 30, "bold"), fill="black")
+        texto3 = pantalla.create_text(500, 640, text=f"Waiting for the Dimple", font=("Helvetica", 30, "bold"), fill="black")
+
     elif counter < 10:
         BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
         Close_Button.configure(bg = "#008000")
         pantalla.configure(bg = "#008000")
         texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
-        texto3 = pantalla.create_text(500, 640, text=f"Waiting for detection...", font=("Helvetica", 30, "bold"), fill="white")
+        texto3 = pantalla.create_text(500, 640, text=f"Dimple Found", font=("Helvetica", 30, "bold"), fill="white")
+
     else:
         Close_Button.configure(bg = "#FF0035")
         pantalla.configure(bg = "#FF0035")
@@ -47,7 +49,7 @@ def visualizar():
         ret, frame = cap.read()
 
         if ret == True:
-            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.20, imgsz = 640)
+            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.50, imgsz = 640)
             height, width, _ = frame.shape
 
             if results is not None:
@@ -61,7 +63,18 @@ def visualizar():
                             if class_id == 0: 
                                 cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 4)
                                 cv2.putText(frame, f"{class_names[0]}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2,)
-            
+                                # BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
+                                # Close_Button.configure(bg = "#008000")
+                                # pantalla.configure(bg = "#008000")
+                                # texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
+                                # texto3 = pantalla.create_text(500, 640, text=f"Dimple Found", font=("Helvetica", 30, "bold"), fill="white")
+                    # else:
+                    #     BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
+                    #     Close_Button.configure(bg = "#FFFFFF")
+                    #     pantalla.configure(bg = "#FFFFFF")
+                    #     texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="black")
+                    #     texto3 = pantalla.create_text(500, 640, text=f"Waiting for the Dimple", font=("Helvetica", 30, "bold"), fill="black")
+
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = imutils.resize(frame, width=640, height=480)
 
