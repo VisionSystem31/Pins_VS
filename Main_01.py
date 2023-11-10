@@ -11,19 +11,18 @@ def visualizar():
     global inicio, cap, frame, model, class_names, texto1, texto3, BoxShadow_id, counter
 
     if inicio == 1:
-        model = YOLO("yolov8s.pt")
-        cap = cv2.VideoCapture(0)
-        cap.set(4, 480) #Alto
-        cap.set(3, 640) #Ancho
-        class_names = ["Person"]
+        model = YOLO("Dimples_N01.pt")
+        cap = cv2.VideoCapture("Dimples_Video_02.mp4")
+        # cap.set(4, 480) #Alto
+        # cap.set(3, 640) #Ancho
+        class_names = ["Dimple"]
         inicio = 0
-        counter = 11
+        counter = 1
     else:
         pantalla.delete(frame)
         pantalla.delete(texto1)
         pantalla.delete(texto3)
         pantalla.delete(BoxShadow_id)
-
 
     if counter < 8:
         BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
@@ -43,13 +42,12 @@ def visualizar():
         BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
         texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
         texto3 = pantalla.create_text(500, 640, text=f"Waiting for detection...", font=("Helvetica", 30, "bold"), fill="white")
-    
 
     if cap is not None:
         ret, frame = cap.read()
 
         if ret == True:
-            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.50, imgsz = 416)
+            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.20, imgsz = 640)
             height, width, _ = frame.shape
 
             if results is not None:
@@ -65,7 +63,7 @@ def visualizar():
                                 cv2.putText(frame, f"{class_names[0]}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2,)
             
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            frame = imutils.resize(frame)
+            frame = imutils.resize(frame, width=640, height=480)
 
             im = Image.fromarray(frame)
             img = ImageTk.PhotoImage(image=im)
