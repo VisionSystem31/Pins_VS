@@ -123,7 +123,7 @@ def turn_off_action():
         print("BBBBBBBB")    
         # variables.Shut_down[0] = 1
         # os.system("sudo shutdown -h now")
-        # root.destroy()
+        root.destroy()
 
 root = tk.Tk()
 root.title("Pins Vision System")

@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Dimples Vision System
+Exec=/usr/bin/python3 /home/jetson/Documents/AI/Pins_VS/Main_01.py
+Type=Application
+StartupNotify=false
+Terminal=false
