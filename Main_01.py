@@ -11,7 +11,7 @@ def visualizar():
     global inicio, cap, frame, model, class_names, texto1, texto3, BoxShadow_id, counter, vector
 
     if inicio == 1:
-        model = YOLO("Dimples_S01.pt")
+        model = YOLO("/home/jetson/Documents/AI/Pins_VS/Dimples_S01.pt")
         cap = cv2.VideoCapture(0)
         # cap.set(4, 480) #Alto
         # cap.set(3, 640) #Ancho
@@ -105,10 +105,10 @@ pantalla = tk.Canvas(root, width=1000, height=700, bg="#FFFFFF")
 pantalla.pack()
 
 #Backgrounds
-BoxShadow = tk.PhotoImage(file="IMG/BoxShadow.png")
+BoxShadow = tk.PhotoImage(file="/home/jetson/Documents/AI/Pins_VS/IMG/BoxShadow.png")
 
 #Boton de cerrado
-Close = tk.PhotoImage(file="IMG/shutdown.png")
+Close = tk.PhotoImage(file="/home/jetson/Documents/AI/Pins_VS/IMG/shutdown.png")
 Close_Button = tk.Button(pantalla, image=Close, bg="#FFFFFF", command=turn_off_action, borderwidth=0, relief="flat")
 Close_Button.place(x = 900, y = 21)
 
