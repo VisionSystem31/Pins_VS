@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter import messagebox
 from PIL import Image, ImageTk 
 import cv2
 import imutils
@@ -6,6 +7,19 @@ import numpy as np
 from datetime import datetime
 from ultralytics import YOLO
 import subprocess
+import Jetson.GPIO as GPIO
+import os 
+
+Salida = 11
+energy_cut = 13
+
+GPIO.setwarnings(False)
+GPIO.setmode(GPIO.BOARD)
+
+GPIO.setup(energy_cut, GPIO.IN)
+
+GPIO.setup(Salida, GPIO.OUT)
+GPIO.output(Salida, True)
 
 def visualizar():
     global inicio, cap, frame, model, class_names, texto1, texto3, BoxShadow_id, counter, vector
@@ -50,7 +64,7 @@ def visualizar():
         ret, frame = cap.read()
 
         if ret == True:
-            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.50, imgsz = 640)
+            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.50, imgsz = 416, device = 0)
             height, width, _ = frame.shape
 
             if results is not None:
@@ -68,6 +82,7 @@ def visualizar():
                     else:
                         vector = [] 
             if len(vector) == 5:
+                GPIO.output(Salida, False)
                 vector = []
                 BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
                 Close_Button.configure(bg = "#008000")
@@ -75,6 +90,7 @@ def visualizar():
                 texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
                 texto3 = pantalla.create_text(500, 640, text=f"Dimple Found", font=("Helvetica", 30, "bold"), fill="white")
             else:
+                GPIO.output(Salida, True)
                 BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
                 Close_Button.configure(bg = "#FFFFFF")
                 pantalla.configure(bg = "#FFFFFF")
@@ -89,12 +105,25 @@ def visualizar():
 
             lblVideo.configure(image=img)
             lblVideo.image = img
+
+            if GPIO.input(energy_cut):
+                print("AAAA")
+                # cap.release()
+                # cv2.destroyAllWindows()
+                # GPIO.cleanup
+                # os.system("sudo shutdown -h now")
+            
             pantalla.after(10, visualizar)
         else:
             cap.release()
 
 def turn_off_action():
-    root.destroy()
+    result = messagebox.askquestion("Confirmar apagado", "Seguro quiere apagar el sistema de vision?", icon='warning')
+    if result == 'yes':
+        print("BBBBBBBB")    
+        # variables.Shut_down[0] = 1
+        # os.system("sudo shutdown -h now")
+        # root.destroy()
 
 root = tk.Tk()
 root.title("Pins Vision System")
