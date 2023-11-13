@@ -22,49 +22,25 @@ GPIO.setup(Salida, GPIO.OUT)
 GPIO.output(Salida, True)
 
 def visualizar():
-    global inicio, cap, frame, model, class_names, texto1, texto3, BoxShadow_id, counter, vector
+    global inicio, cap, frame, model, class_names, texto1, BoxShadow_id, counter, vector
 
     if inicio == 1:
-        model = YOLO("/home/jetson/Documents/AI/Pins_VS/Dimples_S01.pt")
+        model = YOLO("/home/jetson/Documents/AI/Pins_VS/Dimples_S02.pt")
         cap = cv2.VideoCapture(0)
-        # cap.set(4, 480) #Alto
-        # cap.set(3, 640) #Ancho
-        class_names = ["Dimple"]
+        class_names = ["Dimple Found"]
         inicio = 0
         counter = 1
         vector = []
+        BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
     else:
         pantalla.delete(frame)
         pantalla.delete(texto1)
-        pantalla.delete(texto3)
-        pantalla.delete(BoxShadow_id)
-
-    # if counter < 8:
-    #     BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
-    #     Close_Button.configure(bg = "#FFFFFF")
-    #     pantalla.configure(bg = "#FFFFFF")
-    #     texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="black")
-    #     texto3 = pantalla.create_text(500, 640, text=f"Waiting for the Dimple", font=("Helvetica", 30, "bold"), fill="black")
-
-    # elif counter < 10:
-    #     BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
-    #     Close_Button.configure(bg = "#008000")
-    #     pantalla.configure(bg = "#008000")
-    #     texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
-    #     texto3 = pantalla.create_text(500, 640, text=f"Dimple Found", font=("Helvetica", 30, "bold"), fill="white")
-
-    # else:
-    #     Close_Button.configure(bg = "#FF0035")
-    #     pantalla.configure(bg = "#FF0035")
-    #     BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
-    #     texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
-    #     texto3 = pantalla.create_text(500, 640, text=f"Waiting for detection...", font=("Helvetica", 30, "bold"), fill="white")
-
+    
     if cap is not None:
         ret, frame = cap.read()
 
         if ret == True:
-            results = model.predict(frame, verbose=True, agnostic_nms=True, conf = 0.50, imgsz = 416, device = 0)
+            results = model.predict(frame, verbose=False, agnostic_nms=True, conf = 0.50, imgsz = 416, device = 0)
             height, width, _ = frame.shape
 
             if results is not None:
@@ -76,26 +52,21 @@ def visualizar():
                             x1, y1, x2, y2 = map(int, cords)
 
                             if class_id == 0: 
-                                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 4)
-                                cv2.putText(frame, f"{class_names[0]}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2,)
                                 vector.append(class_id)
                     else:
                         vector = [] 
-            if len(vector) == 5:
+            if len(vector) >= 7:
+                cv2.rectangle(frame, (x1, y1), (x2, y2), (0, 255, 255), 4)
+                cv2.putText(frame, f"{class_names[0]}", (x1, y1), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 255), 2,)
                 GPIO.output(Salida, False)
-                vector = []
-                BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
                 Close_Button.configure(bg = "#008000")
                 pantalla.configure(bg = "#008000")
                 texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="white")
-                texto3 = pantalla.create_text(500, 640, text=f"Dimple Found", font=("Helvetica", 30, "bold"), fill="white")
             else:
                 GPIO.output(Salida, True)
-                BoxShadow_id = pantalla.create_image(155, 75, anchor=tk.NW, image=BoxShadow)
                 Close_Button.configure(bg = "#FFFFFF")
                 pantalla.configure(bg = "#FFFFFF")
                 texto1 = pantalla.create_text(500, 55, text="Dimples Vision System", font=("Helvetica", 30, "bold"), fill="black")
-                texto3 = pantalla.create_text(500, 640, text=f"Waiting for the Dimple", font=("Helvetica", 30, "bold"), fill="black")
 
             frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frame = imutils.resize(frame, width=640, height=480)
@@ -107,11 +78,7 @@ def visualizar():
             lblVideo.image = img
 
             if GPIO.input(energy_cut):
-                print("AAAA")
-                # cap.release()
-                # cv2.destroyAllWindows()
-                # GPIO.cleanup
-                # os.system("sudo shutdown -h now")
+                os.system("sudo shutdown -h now")
             
             pantalla.after(10, visualizar)
         else:
@@ -120,17 +87,15 @@ def visualizar():
 def turn_off_action():
     result = messagebox.askquestion("Confirmar apagado", "Seguro quiere apagar el sistema de vision?", icon='warning')
     if result == 'yes':
-        print("BBBBBBBB")    
-        # variables.Shut_down[0] = 1
-        # os.system("sudo shutdown -h now")
+        os.system("sudo shutdown -h now")
         root.destroy()
 
 root = tk.Tk()
-root.title("Pins Vision System")
+root.title("Dimples Vision System")
 
 root.attributes('-fullscreen', True)
 
-pantalla = tk.Canvas(root, width=1000, height=700, bg="#FFFFFF")
+pantalla = tk.Canvas(root, width=1200, height=700, bg="#FFFFFF")
 pantalla.pack()
 
 #Backgrounds
